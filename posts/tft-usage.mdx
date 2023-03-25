@@ -1,0 +1,64 @@
+---
+title: TFT LCD屏幕的使用
+description: "创客实践小组快速入门"
+date: Mar 25 2023
+---
+# 快速上手
+## 接线方式
+![接线方式图片](/tft1.png "LCD屏幕与Arduino的接线图")
+这是根据[官方](https://wiki.dfrobot.com.cn/_SKU_DFR0664_2.0_240x320_LCD)提供的接线图，注意要**完全**按照图中的方式来接线。
+## 参考代码
+```Cpp
+#include "DFRobot_GDL.h"
+
+#define TFT_DC 2
+#define TFT_CS 3
+#define TFT_RST 4
+
+//定义屏幕全局变量
+DFRobot_ST7789_240x320_HW_SPI screen(/*dc=*/TFT_DC, /*cs=*/TFT_CS, /*rst=*/TFT_RST);
+
+void setup() {
+  //初始化屏幕
+  screen.begin();
+}
+
+void loop() {
+  ///设置字体字号为4 字号范围1-4
+  screen.setTextSize(2);
+  //设置屏幕颜色
+  screen.fillScreen(COLOR_RGB565_BLACK);
+  screen.setFont(&FreeMono12pt7b);  //设置字体为FreeMono12pt7b
+  // 设置下面的文本要显示的位置
+  screen.setCursor(/*x=*/10, /*y=*/120);
+  //设置文本颜色
+  screen.setTextColor(COLOR_RGB565_LGRAY);
+  //设置文本自动换行模式,true=文本自动换行，false=不自动换行
+  screen.setTextWrap(true);
+  //显示文字
+  screen.print("Hello World!");
+  delay(1000);
+}
+```
+里面的注释对每一行代码都解释得很清楚了。
+# 详细教程
+## 接线
+首先从[参考文档](https://wiki.dfrobot.com.cn/_SKU_DFR0664_2.0_240x320_LCD)里可以找到其接线方式，由于其使用了SPI通信协议，所以需要按照特定的方式来接线。  
+SPI协议和串口协议一样，都是通过几条线来实现设备之间的通信，串口只有两条线，而SPI需要三条线，分别为MISO，MOSI，SCLK，有时间并且感兴趣可以看[这篇文章](https://zhuanlan.zhihu.com/p/290620901)，这三个口对应的LCD屏幕上的口可以从上述参考文档里看到：
+![LCD的IO口图片](https://img.dfrobot.com.cn/wiki/none/e9c85a9059f0d664795f9b67f807c001)
+这时需要将这三个口接到对应的Arduino的三个口里，而Arduino的这三个口是和IO口重合的，需要知道哪个IO口分别有那三个口的功能的话要去[Arduino官方网站](https://docs.arduino.cc/hardware/uno-rev3)里找：
+![Arduino IO口功能](https://docs.arduino.cc/static/2b141eb1cfe6f465a949c203e4af1b5f/A000066-pinout.png)
+其中CIPO和COPI分别对应MISO和MOSI口。  
+其它LCD上的口理论上讲可以随便接IO口。  
+# 安装库
+从上面说的[参考文档](https://wiki.dfrobot.com.cn/_SKU_DFR0664_2.0_240x320_LCD)里可以找到[需要下载的库文件的网址](https://gitee.com/dfrobot/DFRobot_GDL)：
+![下载库文件的位置图片](/tft2.png)
+进入网站后点击“克隆/下载”然后点击“下载ZIP”：
+![下载库图片](/tft3.png)
+下载完后启动Arduino IDE，然后点击上方菜单的“项目”>“导入库”>“导入.ZIP库”：
+![导入库图片](/tft4.png)
+然后选择刚刚下载的ZIP文件就可以了。
+# 写代码
+可以之间将[参考文档](https://wiki.dfrobot.com.cn/_SKU_DFR0664_2.0_240x320_LCD)里的示例代码原封不动地复制过去IDE里测试一下，但是示例代码比较复杂，不容易读懂，所以可以根据参考文档给出的[DFRobot_GDL API接口函数](https://github.com/DFRobot/DFRobot_GDL/wiki/%E4%B8%AD%E6%96%87-WIKI)网站里寻找更简洁的代码：
+![进入网站图片](/tft5.png)
+该网站的示例代码简洁许多很好看懂，但是注意要将其中的`DFRobot_ST7789_240x240_HW_SPI`改成`DFRobot_ST7789_240x320_HW_SPI`，因为我们的屏幕的分辨率是240x320的。
